@@ -1,0 +1,9 @@
+[package]
+name = "dolls_network"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-std.workspace = true
+spdlog-rs.workspace = true
+anyhow.workspace = true

@@ -1,10 +1,16 @@
 
 [workspace]
 members = [
-    "app",
+    "app", "crates/core", "crates/network",
 ]
 resolver = "2"
 
 [workspace.dependencies]
 log = "0.4"
 spdlog-rs = "0.4"
+async-std = "1.13"
+anyhow = "1"
+
+dolls_core.path = "crates/core"
+dolls_network.path = "crates/network"
+

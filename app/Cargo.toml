@@ -4,5 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+dolls_core.workspace = true
+dolls_network.workspace = true
+
 log.workspace = true
 spdlog-rs.workspace = true
+async-std.workspace = true
