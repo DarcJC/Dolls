@@ -1,0 +1,10 @@
+
+[workspace]
+members = [
+    "app",
+]
+resolver = "2"
+
+[workspace.dependencies]
+log = "0.4"
+spdlog-rs = "0.4"
