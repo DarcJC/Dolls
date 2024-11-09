@@ -1,4 +1,9 @@
 mod raw;
+mod processor;
+mod handshake;
+
+pub use raw::*;
+pub use processor::*;
 
 use std::pin::Pin;
 use async_std::net::TcpStream;

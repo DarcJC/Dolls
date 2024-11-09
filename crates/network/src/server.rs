@@ -1,12 +1,12 @@
 use async_std::net::{TcpListener, TcpStream};
 use async_std::prelude::StreamExt;
-use spdlog::{critical, debug};
+use spdlog::{critical, debug, error};
 use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use async_std::sync::Mutex;
 use async_std::task::JoinHandle;
-use crate::prelude::PacketHandler;
+use crate::prelude::{get_handler, init_packet_processors, PacketHandler};
 
 /// A TCP Server wrapper
 #[derive(Debug)]
@@ -39,6 +39,8 @@ impl DollNetworkServer {
             panic!("DollNetworkServer already running");
         }
 
+        init_packet_processors().await;
+
         self.is_running.store(true, Ordering::Release);
         let tcp_listener = TcpListener::bind(SocketAddr::new(self.ip_address, self.port)).await.unwrap();
         let mut incoming = tcp_listener.incoming();
@@ -56,10 +58,17 @@ impl DollNetworkServer {
         async_std::task::spawn(async move {
             worker_context.stream.set_nodelay(true).unwrap();
 
+            let socket_addr = worker_context.stream.peer_addr().unwrap();
             let mut packet_handler = PacketHandler::new(&mut worker_context.stream);
 
             while let Ok(packet) = packet_handler.next_packet().await {
-                debug!("Packet received: {:?}", packet);
+                if let Some(func) = get_handler(packet.packet_id).await {
+                    if let Err(err)  = func(packet) {
+                        error!("Error processing packet: {}", err);
+                    }
+                } else {
+                    error!("Unexpected packet(id={}) from client {:?}.", packet.packet_id, socket_addr);
+                }
             }
         })
     }
