@@ -7,3 +7,4 @@ edition = "2021"
 async-std.workspace = true
 spdlog-rs.workspace = true
 anyhow.workspace = true
+flate2.workspace = true
