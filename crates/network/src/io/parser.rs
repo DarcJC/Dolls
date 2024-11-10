@@ -1,6 +1,6 @@
-use async_std::net::TcpStream;
 use async_std::io;
-use async_std::prelude::*; // For the `read_exact` method
+use async_std::io::ReadExt;
+// For the `read_exact` method
 
 pub const SEGMENT_BITS: u8 = 0x7F;
 pub const CONTINUE_BIT: u8 = 0x80;
@@ -10,7 +10,7 @@ pub const CONTINUE_BIT: u8 = 0x80;
 /// # Errors
 ///
 /// Returns an `io::Error` if the VarInt is too big or if there is an I/O error.
-pub async fn read_varint(stream: &mut TcpStream) -> io::Result<u32> {
+pub async fn read_varint(stream: &mut (impl ReadExt + Unpin)) -> io::Result<u32> {
 
     let mut value: u32 = 0;
     let mut position: u32 = 0;
@@ -36,12 +36,12 @@ pub async fn read_varint(stream: &mut TcpStream) -> io::Result<u32> {
     Ok(value)
 }
 
-/// Reads a VarInt from the provided `TcpStream`.
+/// Reads a VarInt and actual size of it from the provided `TcpStream`.
 ///
 /// # Errors
 ///
 /// Returns an `io::Error` if the VarInt is too big or if there is an I/O error.
-pub async fn read_varint_and_get_size(stream: &mut TcpStream) -> io::Result<(u32, u32)> {
+pub async fn read_varint_and_get_size(stream: &mut (impl ReadExt + Unpin)) -> io::Result<(u32, u32)> {
     let mut value: u32 = 0;
     let mut position: u32 = 0;
     let mut size = 0;
@@ -68,7 +68,7 @@ pub async fn read_varint_and_get_size(stream: &mut TcpStream) -> io::Result<(u32
     Ok((value, size))
 }
 
-pub async fn read_exact_bytes(stream: &mut TcpStream, size: usize) -> io::Result<Vec<u8>> {
+pub async fn read_exact_bytes(stream: &mut (impl ReadExt + Unpin), size: usize) -> io::Result<Vec<u8>> {
     let mut buffer = vec![0u8; size];
     stream.read_exact(&mut buffer).await?;
     Ok(buffer)

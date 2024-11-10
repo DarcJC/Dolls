@@ -7,7 +7,6 @@ pub use processor::*;
 
 use std::pin::Pin;
 use async_std::net::TcpStream;
-use crate::io::packet::raw::RawPacket;
 use crate::prelude::{read_varint_and_get_size, read_varint, read_exact_bytes};
 
 /// Packet processor to pack packets from tcp stream.

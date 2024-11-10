@@ -1,7 +1,7 @@
-use crate::io::packet::raw::RawPacket;
 use async_std::sync::RwLock;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
+use crate::prelude::{PacketType, RawPacket};
 
 pub type PacketProcessorFn = fn(RawPacket) -> anyhow::Result<()>;
 
@@ -20,7 +20,7 @@ macro_rules! register_packet_processor {
 }
 
 pub struct PacketProcessorRegistration {
-    pub packet_id: u32,
+    pub packet_id: PacketType,
     pub processor: PacketProcessorFn,
 }
 
@@ -29,7 +29,7 @@ inventory::collect!(PacketProcessorRegistration);
 pub async fn init_packet_processors() {
     if HANDLERS.read().await.is_empty() {
         for registration in inventory::iter::<PacketProcessorRegistration> {
-            HANDLERS.write().await.insert(registration.packet_id, registration.processor);
+            HANDLERS.write().await.insert(registration.packet_id as u32, registration.processor);
         }
     }
 }

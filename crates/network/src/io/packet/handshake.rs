@@ -1,8 +1,8 @@
 
 use dolls_macros::packet_processor;
-use crate::io::packet::raw::RawPacket;
+use crate::prelude::{PacketType, RawPacket};
 
-#[packet_processor(0)]
+#[packet_processor(PacketType::Handshake)]
 fn handshake_packet(packet: RawPacket) -> anyhow::Result<()> {
     println!("Handshake: {:?}", packet);
 
